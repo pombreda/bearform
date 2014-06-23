@@ -2,7 +2,7 @@
 import unittest
 from bearform.errors import ValidationError
 from bearform.field import Field
-from bearform.test import TestForm, negative
+from common import TestForm, negative
 
 
 class FieldTest(unittest.TestCase):

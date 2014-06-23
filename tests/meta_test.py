@@ -1,6 +1,6 @@
 """Test meta module."""
 import unittest
-from bearform.test import TestForm
+from common import TestForm
 
 
 class MetaTest(unittest.TestCase):

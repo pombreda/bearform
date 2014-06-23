@@ -1,7 +1,7 @@
 """Test form module."""
 from bearform.errors import ValidationError
-from bearform.test import TestCase, TestForm, TestTopForm
 from bearform.utils import Struct
+from common import TestCase, TestForm, TestTopForm
 
 
 class FormTest(TestCase):

@@ -2,7 +2,7 @@
 import era
 from bearform import types
 from bearform.errors import EncodingError, ValidationError
-from bearform.test import TestCase, TestForm
+from common import TestCase, TestForm
 
 
 class TestFieldType(TestCase):
