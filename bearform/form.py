@@ -75,17 +75,18 @@ class Form(object):
         for name, value in kwargs.iteritems():
             setattr(self, name, value)
 
-    def encode(self):
+    def encode(self, missing=False):
         """
         Return the form data encoded as a dictionary ready for serialization. Data is not validated
-        during this method.
+        during this method. If missing is True then fields set to `None` will be included.
         """
         encoded = {}
         for name, field in self._meta.fields.iteritems():
             value = self._attrs.get(name)
             if value is not None:
                 value = field.encode(self.__class__, name, value)
-            encoded[name] = value
+            if value is not None or missing:
+                encoded[name] = value
         return encoded
 
     def validate(self):

@@ -134,9 +134,9 @@ class FormTest(TestCase):
 
     def test_encode(self):
         """Form.encode"""
-        def test(value, want):
+        def test(value, want, *args, **kwargs):
             form = TestForm(**value)
-            self.assertCall(want, form.encode)
+            self.assertCall(want, form.encode, *args, **kwargs)
 
         # with all values
         value = {'index': 3, 'name': 'third', 'optional': 'present'}
@@ -146,6 +146,10 @@ class FormTest(TestCase):
         # with missing form data
         value = {'index': 3}
         want = {'index': 3, 'name': None, 'optional': 'missing'}
+        test(value, want, True)
+
+        value = {'index': 3}
+        want = {'index': 3, 'optional': 'missing'}
         test(value, want)
 
         # with extra form data
