@@ -17,7 +17,7 @@ setup_requires = [
 
 setup(
     name='bearform',
-    version='1.0',
+    version='1.1',
     description="Easy data conversion and validation for frontends.",
     long_description=readme,
     classifiers=[
