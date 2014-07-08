@@ -1,7 +1,7 @@
 """Test form module."""
 from bearform.errors import ValidationError
 from bearform.utils import Struct
-from common import TestCase, TestForm, TestTopForm
+from common import TestCase, TestForm, TestTopForm, TestListForm, TestDictForm
 
 
 class FormTest(TestCase):
@@ -37,6 +37,24 @@ class FormTest(TestCase):
 
         data = form.encode()
         self.assertEqual(data, {'sub': {'name': 'test'}})
+
+        class CollectionData(object):
+            def __init__(self, sub):
+                self.subs = sub
+
+        obj = CollectionData([SubData('test1'), SubData('test2')])
+        form = TestListForm.from_obj(obj)
+        self.assertEqual(form.subs, [{'name': 'test1'}, {'name': 'test2'}])
+
+        data = form.encode()
+        self.assertEqual(data, {'subs': [{'name': 'test1'}, {'name': 'test2'}]})
+
+        obj = CollectionData({'one': SubData('test1'), 'two': SubData('test2')})
+        form = TestDictForm.from_obj(obj)
+        self.assertEqual(form.subs, {'one': {'name': 'test1'}, 'two': {'name': 'test2'}})
+
+        data = form.encode()
+        self.assertEqual(data, {'subs': {'one': {'name': 'test1'}, 'two': {'name': 'test2'}}})
 
     def test_decode(self):
         """Form.decode"""

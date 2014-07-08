@@ -1,7 +1,7 @@
 """Form classes."""
 from .errors import ValidationError
 from .meta import FormBuilder
-from .types import FormType
+from .types import FormType, ListType, SetType, DictType
 from .utils import Struct
 
 
@@ -21,9 +21,16 @@ class Form(object):
             for name, field in form._meta.fields.iteritems():
                 if hasattr(obj, name):
                     value = getattr(obj, name)
-                    print('field', name, field.typ)
-                    if value is not None and isinstance(field.typ, FormType):
-                        value = obj_to_dict(field.typ.form, value)
+                    if value is not None:
+                        if isinstance(field.typ, FormType):
+                            value = obj_to_dict(field.typ.form, value)
+                        if (isinstance(field.typ, (ListType, SetType)) and
+                                isinstance(field.typ.typ, FormType)):
+                            value = [obj_to_dict(field.typ.typ.form, v) for v in value]
+                        if (isinstance(field.typ, DictType) and
+                                isinstance(field.typ.typ, FormType)):
+                            value = {k: obj_to_dict(field.typ.typ.form, v)
+                                     for k, v in value.iteritems()}
                     values[name] = value
             return values
 

@@ -36,6 +36,14 @@ class TestTopForm(Form):
     sub = Field(TestSubForm)
 
 
+class TestListForm(Form):
+    subs = Field([TestSubForm])
+
+
+class TestDictForm(Form):
+    subs = Field({'_': TestSubForm})
+
+
 class TestCase(unittest.TestCase):
 
     def assertCall(self, want, func, *args, **kwargs):
