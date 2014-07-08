@@ -7,6 +7,19 @@ from common import TestCase, TestForm, TestTopForm
 class FormTest(TestCase):
     """Test for Form class."""
 
+    def test_from_obj(self):
+        """Form.from_obj"""
+        class Data(object):
+            def __init__(self, index, name):
+                self.index = index
+                self.name = name
+
+        data = Data(1, 'object')
+        form = TestForm.from_obj(data)
+        self.assertEqual(form.index, data.index)
+        self.assertEqual(form.name, data.name)
+        self.assertEqual(form.optional, 'missing')
+
     def test_decode(self):
         """Form.decode"""
         def test(value, want, **options):

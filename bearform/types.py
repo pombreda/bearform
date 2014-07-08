@@ -42,11 +42,11 @@ class FieldType(object):
         return value
 
     def encode(self, cls, name, value):
-        """Return the value encoded for storage in the database."""
+        """Return the value encoded for transmission to the frontend."""
         return value
 
     def decode(self, cls, name, value):
-        """Return the value decoded from database storage."""
+        """Return the value decoded from the frontend."""
         return value
 
     def validate(self, cls, name, value):

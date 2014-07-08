@@ -10,6 +10,19 @@ class Form(object):
     __metaclass__ = FormBuilder
 
     @classmethod
+    def from_obj(cls, obj):
+        """
+        Return a form object containing the values extracted from attributes on the provided
+        object. No decoding or validation is performed. This has the same effect as passing the
+        values as kwargs to `__init__`. Missing attributes are skipped.
+        """
+        form = cls()
+        for name, field in cls._meta.fields.iteritems():
+            if hasattr(obj, name):
+                setattr(form, name, getattr(obj, name))
+        return form
+
+    @classmethod
     def decode(cls, raw, extra=None, require=True, validate=True):
         """
         Return a form object containing the raw form data. By default fields present in raw that
