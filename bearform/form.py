@@ -16,11 +16,19 @@ class Form(object):
         object. No decoding or validation is performed. This has the same effect as passing the
         values as kwargs to `__init__`. Missing attributes are skipped.
         """
-        form = cls()
-        for name, field in cls._meta.fields.iteritems():
-            if hasattr(obj, name):
-                setattr(form, name, getattr(obj, name))
-        return form
+        def obj_to_dict(form, obj):
+            values = {}
+            for name, field in form._meta.fields.iteritems():
+                if hasattr(obj, name):
+                    value = getattr(obj, name)
+                    print('field', name, field.typ)
+                    if value is not None and isinstance(field.typ, FormType):
+                        value = obj_to_dict(field.typ.form, value)
+                    values[name] = value
+            return values
+
+        values = obj_to_dict(cls, obj)
+        return cls(**values)
 
     @classmethod
     def decode(cls, raw, extra=None, require=True, validate=True):

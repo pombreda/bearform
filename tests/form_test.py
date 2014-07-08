@@ -14,11 +14,29 @@ class FormTest(TestCase):
                 self.index = index
                 self.name = name
 
-        data = Data(1, 'object')
-        form = TestForm.from_obj(data)
-        self.assertEqual(form.index, data.index)
-        self.assertEqual(form.name, data.name)
+        obj = Data('1', 'object')
+        form = TestForm.from_obj(obj)
+        self.assertEqual(form.index, obj.index)
+        self.assertEqual(form.name, obj.name)
         self.assertEqual(form.optional, 'missing')
+
+        data = form.encode()
+        self.assertEqual(data, {'index': 1, 'name': 'object', 'optional': 'missing'})
+
+        class TopData(object):
+            def __init__(self, sub):
+                self.sub = sub
+
+        class SubData(object):
+            def __init__(self, name):
+                self.name = name
+
+        obj = TopData(SubData('test'))
+        form = TestTopForm.from_obj(obj)
+        self.assertEqual(form.sub, {'name': 'test'})
+
+        data = form.encode()
+        self.assertEqual(data, {'sub': {'name': 'test'}})
 
     def test_decode(self):
         """Form.decode"""
