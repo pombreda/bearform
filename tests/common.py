@@ -26,6 +26,7 @@ class TestForm(Form):
     index = Field(int, validators=[positive])
     name = Field(str)
     optional = Field(str, require=False, default='missing')
+    none = Field(str, require=False)
 
 
 class TestSubForm(Form):
@@ -51,4 +52,4 @@ class TestCase(unittest.TestCase):
             self.assertRaises(want, func, *args, **kwargs)
         else:
             have = func(*args, **kwargs)
-            self.assertEqual(have, want)
+            self.assertEqual(want, have)

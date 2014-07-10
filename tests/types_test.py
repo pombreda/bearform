@@ -296,18 +296,18 @@ class TestFormType(TestCase):
             self.assertCall(want, self.typ(TestForm).decode, TestForm, 'test', value)
 
         # no decoding needed
-        value = {'index': 1, 'name': 'one', 'optional': 'present'}
+        value = {'index': 1, 'name': 'one', 'optional': 'present', 'none': 'not none'}
         want = value.copy()
         test(value, want)
 
         # needs decoding
         value = {'index': '1', 'name': 'one', 'optional': 'present'}
-        want = {'index': 1, 'name': 'one', 'optional': 'present'}
+        want = {'index': 1, 'name': 'one', 'optional': 'present', 'none': None}
         test(value, want)
 
         # missing optional
         value = {'index': '1', 'name': 'one'}
-        want = {'index': 1, 'name': 'one', 'optional': 'missing'}
+        want = {'index': 1, 'name': 'one', 'optional': 'missing', 'none': None}
         test(value, want)
 
         # invalid

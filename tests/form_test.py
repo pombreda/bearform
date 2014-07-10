@@ -21,7 +21,7 @@ class FormTest(TestCase):
         self.assertEqual(form.optional, 'missing')
 
         data = form.encode()
-        self.assertEqual(data, {'index': 1, 'name': 'object', 'optional': 'missing'})
+        self.assertEqual({'index': 1, 'name': 'object', 'optional': 'missing'}, data)
 
         class TopData(object):
             def __init__(self, sub):
@@ -33,10 +33,10 @@ class FormTest(TestCase):
 
         obj = TopData(SubData('test'))
         form = TestTopForm.from_obj(obj)
-        self.assertEqual(form.sub, {'name': 'test'})
+        self.assertEqual({'name': 'test'}, form.sub)
 
         data = form.encode()
-        self.assertEqual(data, {'sub': {'name': 'test'}})
+        self.assertEqual({'sub': {'name': 'test'}}, data)
 
         class CollectionData(object):
             def __init__(self, sub):
@@ -44,17 +44,17 @@ class FormTest(TestCase):
 
         obj = CollectionData([SubData('test1'), SubData('test2')])
         form = TestListForm.from_obj(obj)
-        self.assertEqual(form.subs, [{'name': 'test1'}, {'name': 'test2'}])
+        self.assertEqual([{'name': 'test1'}, {'name': 'test2'}], form.subs)
 
         data = form.encode()
-        self.assertEqual(data, {'subs': [{'name': 'test1'}, {'name': 'test2'}]})
+        self.assertEqual({'subs': [{'name': 'test1'}, {'name': 'test2'}]}, data)
 
         obj = CollectionData({'one': SubData('test1'), 'two': SubData('test2')})
         form = TestDictForm.from_obj(obj)
-        self.assertEqual(form.subs, {'one': {'name': 'test1'}, 'two': {'name': 'test2'}})
+        self.assertEqual({'one': {'name': 'test1'}, 'two': {'name': 'test2'}}, form.subs)
 
         data = form.encode()
-        self.assertEqual(data, {'subs': {'one': {'name': 'test1'}, 'two': {'name': 'test2'}}})
+        self.assertEqual({'subs': {'one': {'name': 'test1'}, 'two': {'name': 'test2'}}}, data)
 
     def test_decode(self):
         """Form.decode"""
@@ -64,7 +64,7 @@ class FormTest(TestCase):
             self.assertCall(want, func)
 
         # with all values
-        want = {'index': 1, 'name': 'first', 'optional': 'here'}
+        want = {'index': 1, 'name': 'first', 'optional': 'here', 'none': 'not none'}
         value = want.copy()
         test(value, want)
 
@@ -77,8 +77,9 @@ class FormTest(TestCase):
         test(value, ValidationError)
 
         # with extra form data ignored
-        value = {'index': 1, 'name': 'first', 'optional': 'here', 'unknown': 'yes'}
-        want = {'index': 1, 'name': 'first', 'optional': 'here'}
+        value = {'index': 1, 'name': 'first', 'optional': 'here', 'none': 'not none',
+                 'unknown': 'yes'}
+        want = {'index': 1, 'name': 'first', 'optional': 'here', 'none': 'not none'}
         test(value, want, extra=True)
 
         # with extra form data defined
@@ -88,49 +89,49 @@ class FormTest(TestCase):
         test(value, ValidationError, extra=['known'])
 
         # without optional form data
-        want = {'index': 1, 'name': 'first', 'optional': 'missing'}
+        want = {'index': 1, 'name': 'first', 'optional': 'missing', 'none': None}
         value = {'index': 1, 'name': 'first'}
         test(value, want)
 
         # with data that requires encoding
-        want = {'index': 1, 'name': 'first', 'optional': 'here'}
-        value = {'index': '1', 'name': 'first', 'optional': 'here'}
+        want = {'index': 1, 'name': 'first', 'optional': 'here', 'none': 'not none'}
+        value = {'index': '1', 'name': 'first', 'optional': 'here', 'none': 'not none'}
         test(value, want)
 
         # with invalid fields with validation enabled
-        value = {'index': -3, 'name': 'first', 'optional': 'here'}
+        value = {'index': -3, 'name': 'first', 'optional': 'here', 'none': 'not none'}
         test(value, ValidationError)
 
         # with invalid fields with validation disabled
-        want = {'index': -3, 'name': 'first', 'optional': 'here'}
+        want = {'index': -3, 'name': 'first', 'optional': 'here', 'none': 'not none'}
         value = want.copy()
         test(value, want, validate=False)
 
     def test_init(self):
         """Form.__init__"""
         # empty init
-        value = {'index': None, 'name': None, 'optional': 'missing'}
-        self.assertEqual(TestForm()._attrs, value)
+        value = {'index': None, 'name': None, 'optional': 'missing', 'none': None}
+        self.assertEqual(value, TestForm()._attrs)
 
         # init with valid values
-        value = {'index': 2, 'name': 'second', 'optional': 'present'}
-        self.assertEqual(TestForm(**value)._attrs, value)
+        value = {'index': 2, 'name': 'second', 'optional': 'present', 'none': None}
+        self.assertEqual(value, TestForm(**value)._attrs)
 
         # init with invalid values
-        value = {'index': -3, 'name': 'second', 'optional': 'present'}
-        self.assertEqual(TestForm(**value)._attrs, value)
+        value = {'index': -3, 'name': 'second', 'optional': 'present', 'none': None}
+        self.assertEqual(value, TestForm(**value)._attrs)
 
         # init with extra values
         value = {'index': 2, 'name': 'second', 'optional': 'present', 'unknown': 'yes'}
-        want = {'index': 2, 'name': 'second', 'optional': 'present'}
+        want = {'index': 2, 'name': 'second', 'optional': 'present', 'none': None}
         form = TestForm(**value)
-        self.assertEqual(form._attrs, want)
-        self.assertEqual(form.unknown, 'yes')
+        self.assertEqual(want, form._attrs)
+        self.assertEqual('yes', form.unknown)
 
         # init with missing values
         value = {'index': 2}
-        want = {'index': 2, 'name': None, 'optional': 'missing'}
-        self.assertEqual(TestForm(**value)._attrs, want)
+        want = {'index': 2, 'name': None, 'optional': 'missing', 'none': None}
+        self.assertEqual(want, TestForm(**value)._attrs)
 
     def test_encode(self):
         """Form.encode"""
@@ -145,7 +146,7 @@ class FormTest(TestCase):
 
         # with missing form data
         value = {'index': 3}
-        want = {'index': 3, 'name': None, 'optional': 'missing'}
+        want = {'index': 3, 'name': None, 'optional': 'missing', 'none': None}
         test(value, want, True)
 
         value = {'index': 3}
@@ -192,25 +193,25 @@ class FormTest(TestCase):
 
     def test_to_dict(self):
         """Form.to_dict"""
-        value = {'index': 5, 'name': 'fifth', 'optional': 'present'}
+        value = {'index': 5, 'name': 'fifth', 'optional': 'present', 'none': None}
         form = TestForm(**value)
         have = form.to_dict()
-        self.assertEqual(have, value)
+        self.assertEqual(value, have)
 
     def test_to_obj(self):
         """Form.to_obj"""
-        value = {'index': 6, 'name': 'sixth', 'optional': 'present'}
+        value = {'index': 6, 'name': 'sixth', 'optional': 'present', 'none': None}
         want = Struct(**value)
         form = TestForm(**value)
 
         # create new object
         have = form.to_obj()
-        self.assertEqual(vars(have), vars(want))
+        self.assertEqual(vars(want), vars(have))
 
         # update existing object
         have = Struct(index=12, name='nope')
         form.to_obj(have)
-        self.assertEqual(vars(have), vars(want))
+        self.assertEqual(vars(want), vars(have))
 
     def test_to_obj_subform(self):
         """Form.to_obj with subform"""
@@ -225,9 +226,9 @@ class FormTest(TestCase):
 
         # create new object
         have = form.to_obj()
-        self.assertEqual(struct_vars(have), struct_vars(want))
+        self.assertEqual(struct_vars(want), struct_vars(have))
 
         # update existing object
         have = Struct(sub=None)
         form.to_obj(have)
-        self.assertEqual(struct_vars(have), struct_vars(want))
+        self.assertEqual(struct_vars(want), struct_vars(have))

@@ -96,7 +96,8 @@ class Form(object):
             if value is None and field.require is True:
                 msg = "{} data is missing required fields: {}"
                 raise ValidationError(msg.format(self.__class__.__name__, name))
-            field.validate(self.__class__, name, value)
+            if value is not None:
+                field.validate(self.__class__, name, value)
 
     def to_dict(self):
         """Return the decoded form data as a dictionary."""
